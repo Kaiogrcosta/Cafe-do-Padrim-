@@ -24,8 +24,8 @@ label{display:block;font-size:13px;color:var(--muted);margin:15px 0 6px}.input{w
 <body>
 <div id="root"></div>
 <script>
-const SUPABASE_URL='https://dpayeuceopjbqgovguq.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYXlldWNlb3BqYmdxdm9ndnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MzMzMjAsImV4cCI6MjEwMzQwOTMyMH0.U3MpO7-jRBa1EoBhWM5dZfBYoL5byypBWgHMF6d9oOM';
+const SUPABASE_URL='https://dpayeuceopjbgqvogvuq.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable__XFoteYjmoTsY77Prw3kwg_Yze3b2z1';
 const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('COLOQUE_AQUI')&&!SUPABASE_ANON_KEY.includes('COLOQUE_AQUI');
 const sb=configured?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 
@@ -59,14 +59,14 @@ async function submitAuth(mode){
  if(!pass)return msg(m,'Digite uma senha.');
  if(mode==='signup'&&pass!==document.getElementById('authPass2').value)return msg(m,'As senhas não conferem.');
  try{
-   const r=mode==='signup'?await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:location.origin}}):await sb.auth.signInWithPassword({email,password:pass});
+   const r=mode==='signup'?await sb.auth.signUp({email,password:pass}):await sb.auth.signInWithPassword({email,password:pass});
    if(r.error)throw r.error;
    if(mode==='signup'&&!r.data.session){
      msg(m,'Perfil criado! Confira o Gmail para confirmar o endereço e depois entre no CAFÉ DO PADRIM.',true);
      return;
    }
    await start(r.data.user);
- }catch(e){msg(m,(e&&e.message)?e.message:'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.')}
+ }catch(e){msg(m,e.message||'Não foi possível concluir o acesso.')}
 }
 async function forgotPassword(){
  const email=prompt('Digite o e-mail do perfil para receber o link de recuperação:');
