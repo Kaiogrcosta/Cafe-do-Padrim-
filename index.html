@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6b4226">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CAFÉ DO PADRIM">
+<link rel="manifest" href="manifest.webmanifest">
+<title>CAFÉ DO PADRIM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f6f2ed;--card:#fff;--ink:#2d241f;--muted:#756b64;--brand:#6b4226;--line:#e4d9d0;--ok:#2e7d32;--danger:#b3261e}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}.auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#f6f2ed,#eaded3)}
+.authcard{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 12px 40px #0002}.logo{text-align:center;font-size:48px}.authcard h1{text-align:center;margin:7px 0}.sub{text-align:center;color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);margin:15px 0 6px}.input{width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;background:#fff}.primary{background:var(--brand);color:#fff;padding:11px 15px;border:0;border-radius:10px;font-weight:700;cursor:pointer}.fullbtn{width:100%;margin-top:16px}.secondary{background:#eee5de;color:var(--ink);padding:10px 14px;border:0;border-radius:9px;cursor:pointer}.linkbtn{display:block;margin:15px auto 0;border:0;background:none;color:var(--brand);font-weight:700;cursor:pointer}.msg{display:none;margin-top:12px;padding:11px;border-radius:9px;font-size:13px}.msg.error{display:block;background:#fde7e5;color:var(--danger)}.msg.ok{display:block;background:#e6f4e7;color:var(--ok)}.hint{font-size:12px;color:var(--muted);text-align:center;line-height:1.5;margin-top:14px}
+.app{min-height:100vh;display:flex}.side{position:fixed;inset:0 auto 0 0;width:245px;background:#2e2119;color:#fff;padding:20px;z-index:10}.brand{font-weight:900;font-size:20px;margin-bottom:22px}.nav button{width:100%;display:block;text-align:left;background:transparent;color:#ddd;border:0;padding:11px;border-radius:9px;margin:4px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#4b3527;color:#fff}.userbox{border-top:1px solid #5a4638;margin-top:18px;padding-top:15px;font-size:12px}.useremail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:9px}.main{margin-left:245px;width:calc(100% - 245px);padding:22px;max-width:1500px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.top h1{margin:0;font-size:25px}.muted{color:var(--muted);font-size:13px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card,.section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:17px}.metric{font-size:25px;font-weight:800;margin-top:6px}.grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-top:14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:5px 8px;border-radius:99px;background:#eee5de;font-size:12px}.ok{background:#e6f4e7;color:var(--ok)}.danger{background:#fde7e5;color:var(--danger)}.empty{text-align:center;color:var(--muted);padding:25px}.search{display:flex;gap:10px;margin-bottom:13px}.search .input{flex:1}.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.col{background:#f1ebe5;border-radius:12px;padding:10px;min-height:230px}.lead{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0}.lead strong{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.profileHero{display:flex;align-items:center;gap:15px;padding:20px;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px}.avatar{width:58px;height:58px;border-radius:50%;background:#6b4226;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:800}.profileEmail{font-size:14px;color:var(--muted)}.profileActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.mobilebar{display:none}
+@media(max-width:900px){.side{display:none}.main{margin-left:0;width:100%;padding:14px 14px 80px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.kanban{grid-template-columns:1fr 1fr}.mobilebar{display:flex;position:fixed;left:0;right:0;bottom:0;background:#2e2119;z-index:20;justify-content:space-around;padding:7px}.mobilebar button{background:transparent;color:#fff;border:0;font-size:11px}.top h1{font-size:21px}.formgrid{grid-template-columns:1fr}}
+@media(max-width:520px){.kanban{grid-template-columns:1fr}.cards{gap:8px}.card{padding:12px}.metric{font-size:20px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const SUPABASE_URL='https://dpayeuceopjbqgovguq.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYXlldWNlb3BqYmdxdm9ndnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MzMzMjAsImV4cCI6MjEwMzQwOTMyMH0.U3MpO7-jRBa1EoBhWM5dZfBYoL5byypBWgHMF6d9oOM';
+const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('COLOQUE_AQUI')&&!SUPABASE_ANON_KEY.includes('COLOQUE_AQUI');
+const sb=configured?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+
+const state={page:'dashboard',user:null,profile:null,customers:[],leads:[],products:[],orders:[],tasks:[]};
+const menus=[['dashboard','📊 Dashboard'],['customers','👥 Clientes'],['leads','🎯 Leads'],['orders','📦 Pedidos'],['products','☕ Produtos'],['tasks','✅ Tarefas'],['profile','👤 PERFIL']];
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function money(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
+function msg(el,text,ok=false){el.textContent=text;el.className='msg '+(ok?'ok':'error');el.style.display='block'}
+function go(p){state.page=p;renderApp()}
+function initials(email){return (email||'?').trim().slice(0,1).toUpperCase()}
+function authScreen(mode='login'){
+ document.getElementById('root').innerHTML=`<div class="auth"><section class="authcard">
+ <div class="logo">☕</div><h1>CAFÉ DO PADRIM</h1>
+ <p class="sub">${mode==='signup'?'Crie seu perfil':'Entre no seu perfil'}</p>
+ <label>E-mail (seu Gmail ou outro e-mail)</label><input class="input" id="authEmail" type="email" autocomplete="email" placeholder="seunome@gmail.com">
+ <label>Senha</label><input class="input" id="authPass" type="password" autocomplete="${mode==='signup'?'new-password':'current-password'}" placeholder="Crie ou digite sua senha">
+ ${mode==='signup'?'<label>Confirmar senha</label><input class="input" id="authPass2" type="password" autocomplete="new-password" placeholder="Repita sua senha">':''}
+ <button class="primary fullbtn" onclick="submitAuth('${mode}')">${mode==='signup'?'CRIAR PERFIL':'ENTRAR'}</button>
+ <button class="linkbtn" onclick="authScreen('${mode==='signup'?'login':'signup'}')">${mode==='signup'?'Já tenho um perfil':'Criar novo perfil'}</button>
+ ${mode==='login'?'<button class="linkbtn" onclick="forgotPassword()">Esqueci minha senha</button>':''}
+ <div id="authMsg" class="msg"></div>
+ <div class="hint">Cada perfil usa um e-mail e uma senha próprios. O e-mail pode ser o Gmail da pessoa. A senha é criada pela própria pessoa e pode conter letras, números e símbolos.</div>
+ </section></div>`;
+}
+async function submitAuth(mode){
+ const email=document.getElementById('authEmail').value.trim();
+ const pass=document.getElementById('authPass').value;
+ const m=document.getElementById('authMsg');
+ if(!email||!email.includes('@'))return msg(m,'Digite um e-mail válido.');
+ if(!pass)return msg(m,'Digite uma senha.');
+ if(mode==='signup'&&pass!==document.getElementById('authPass2').value)return msg(m,'As senhas não conferem.');
+ try{
+   const r=mode==='signup'?await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:location.origin}}):await sb.auth.signInWithPassword({email,password:pass});
+   if(r.error)throw r.error;
+   if(mode==='signup'&&!r.data.session){
+     msg(m,'Perfil criado! Confira o Gmail para confirmar o endereço e depois entre no CAFÉ DO PADRIM.',true);
+     return;
+   }
+   await start(r.data.user);
+ }catch(e){msg(m,(e&&e.message)?e.message:'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.')}
+}
+async function forgotPassword(){
+ const email=prompt('Digite o e-mail do perfil para receber o link de recuperação:');
+ if(!email)return;
+ const r=await sb.auth.resetPasswordForEmail(email.trim(),{redirectTo:location.href});
+ if(r.error)alert(r.error.message);else alert('Enviamos as instruções de recuperação para o e-mail informado.');
+}
+async function start(user){state.user=user;await loadProfile();await loadAll();renderApp()}
+async function loadProfile(){
+ const r=await sb.from('profiles').select('*').eq('id',state.user.id).maybeSingle();
+ state.profile=r.data||{id:state.user.id,email:state.user.email};
+}
+async function loadAll(){
+ for(const t of ['customers','leads','products','orders','tasks']){
+  const r=await sb.from(t).select('*').order('created_at',{ascending:true});
+  state[t]=r.error?[]:(r.data||[]);
+ }
+}
+async function insert(t,row){
+ const r=await sb.from(t).insert({...row,user_id:state.user.id}).select().single();
+ if(r.error)throw r.error;return r.data;
+}
+async function update(t,id,row){
+ const r=await sb.from(t).update(row).eq('id',id);if(r.error)throw r.error;
+}
+async function logout(){await sb.auth.signOut();state.user=null;state.profile=null;authScreen('login')}
+
+function shell(){
+ document.getElementById('root').innerHTML=`<div class="app"><aside class="side"><div class="brand">☕ CAFÉ DO PADRIM</div><div class="nav" id="nav"></div><div class="userbox" id="userbox"></div></aside><main class="main" id="app"></main><div class="mobilebar" id="mobilebar"></div></div>`;
+}
+function layout(){
+ document.getElementById('nav').innerHTML=menus.map(([k,t])=>`<button class="${state.page===k?'active':''}" onclick="go('${k}')">${t}</button>`).join('');
+ document.getElementById('mobilebar').innerHTML=menus.map(([k,t])=>`<button onclick="go('${k}')">${t.split(' ')[0]}<br>${t.replace(/^[^ ]+ /,'')}</button>`).join('');
+ document.getElementById('userbox').innerHTML=`<div class="useremail">${esc(state.user.email)}</div><button class="secondary" style="width:100%" onclick="go('profile')">Abrir PERFIL</button>`;
+}
+function modal(title,body,save){
+ const x=document.createElement('div');x.style.cssText='position:fixed;inset:0;background:#0008;z-index:50;display:grid;place-items:center;padding:15px';
+ x.innerHTML=`<div class="section" style="width:min(600px,100%);max-height:90vh;overflow:auto"><div class="top"><h2>${title}</h2><button class="secondary" onclick="this.closest('[data-modal]').remove()">Fechar</button></div>${body}<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:15px"><button class="secondary" onclick="this.closest('[data-modal]').remove()">Cancelar</button><button class="primary" id="save">Salvar</button></div></div>`;
+ x.dataset.modal='1';document.body.appendChild(x);x.querySelector('#save').onclick=async()=>{try{if(await save(x))x.remove()}catch(e){alert(e.message||'Erro ao salvar')}};
+}
+function dashboard(){
+ const done=state.orders.filter(o=>o.status==='Concluído');const revenue=done.reduce((s,o)=>s+Number(o.total||0),0);
+ return `<div class="top"><div><h1>Dashboard</h1><div class="muted">Bem-vindo ao CAFÉ DO PADRIM</div></div><button class="primary" onclick="newCustomer()">+ Cliente</button></div>
+ <div class="cards"><div class="card"><div class="muted">Faturamento concluído</div><div class="metric">${money(revenue)}</div></div><div class="card"><div class="muted">Pedidos concluídos</div><div class="metric">${done.length}</div></div><div class="card"><div class="muted">Clientes</div><div class="metric">${state.customers.length}</div></div><div class="card"><div class="muted">Leads</div><div class="metric">${state.leads.length}</div></div></div>
+ <div class="grid"><div class="section"><h2>Últimos pedidos</h2>${state.orders.length?`<div class="tablewrap"><table><tr><th>Cliente</th><th>Data</th><th>Total</th><th>Status</th></tr>${state.orders.slice().reverse().slice(0,8).map(o=>`<tr><td>${esc(o.customer)}</td><td>${esc(o.date)}</td><td>${money(o.total)}</td><td><span class="badge ${o.status==='Concluído'?'ok':o.status==='Cancelado'?'danger':''}">${esc(o.status)}</span></td></tr>`).join('')}</table></div>`:'<div class="empty">Nenhum pedido.</div>'}</div><div class="section"><h2>Tarefas</h2>${state.tasks.filter(t=>t.status!=='Concluída').slice(0,5).map(t=>`<div class="lead"><strong>${esc(t.title)}</strong><span class="muted">${esc(t.date||'Sem data')}</span></div>`).join('')||'<div class="empty">Nenhuma tarefa pendente.</div>'}</div></div>`;
+}
+function customers(){
+ return `<div class="top"><div><h1>Clientes</h1><div class="muted">Cadastro e relacionamento</div></div><button class="primary" onclick="newCustomer()">+ Novo cliente</button></div>
+ <div class="section"><div class="search"><input class="input" id="q" placeholder="Buscar cliente..." oninput="filterCustomers()"></div><div id="ct">${customerTable(state.customers)}</div></div>`;
+}
+function customerTable(a){if(!a.length)return '<div class="empty">Nenhum cliente cadastrado.</div>';return `<div class="tablewrap"><table><tr><th>Nome</th><th>Tipo</th><th>WhatsApp</th><th>Status</th></tr>${a.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.type)}</td><td>${esc(c.phone||'-')}</td><td><span class="badge">${esc(c.status||'Novo cliente')}</span></td></tr>`).join('')}</table></div>`}
+function filterCustomers(){const q=document.getElementById('q').value.toLowerCase();document.getElementById('ct').innerHTML=customerTable(state.customers.filter(c=>JSON.stringify(c).toLowerCase().includes(q)))}
+function newCustomer(){modal('Novo cliente',`<div class="formgrid"><div><label>Nome</label><input class="input" id="name"></div><div><label>Tipo</label><select class="input" id="type"><option>Pessoa Física</option><option>Pessoa Jurídica</option></select></div><div><label>WhatsApp</label><input class="input" id="phone"></div><div><label>E-mail</label><input class="input" id="email" type="email"></div><div><label>Cidade</label><input class="input" id="city"></div><div><label>Status</label><select class="input" id="status"><option>Novo cliente</option><option>Ativo</option><option>Recorrente</option><option>VIP</option><option>Inativo</option></select></div></div>`,async x=>{const name=x.querySelector('#name').value.trim();if(!name)return false;const r=await insert('customers',{name,type:x.querySelector('#type').value,phone:x.querySelector('#phone').value,email:x.querySelector('#email').value,city:x.querySelector('#city').value,status:x.querySelector('#status').value});state.customers.push(r);renderApp();return true})}
+function leads(){const s=['Novo Lead','Contato realizado','Interesse identificado','Proposta enviada','Negociação','Venda realizada'];return `<div class="top"><div><h1>Leads & Pipeline</h1><div class="muted">Oportunidades comerciais</div></div><button class="primary" onclick="newLead()">+ Novo lead</button></div><div class="kanban">${s.map(st=>`<div class="col"><h3>${st}</h3>${state.leads.filter(l=>l.stage===st).map(l=>`<div class="lead"><strong>${esc(l.name)}</strong><span class="muted">${money(l.value)}</span><br><button class="secondary" style="margin-top:7px" onclick="advance('${l.id}')">Avançar →</button></div>`).join('')||'<div class="muted" style="padding:10px">Vazio</div>'}</div>`).join('')}</div>`}
+function newLead(){modal('Novo lead',`<label>Nome</label><input class="input" id="name"><label>Valor potencial</label><input class="input" id="value" type="number" step="0.01">`,async x=>{const name=x.querySelector('#name').value.trim();if(!name)return false;const r=await insert('leads',{name,value:Number(x.querySelector('#value').value)||0,stage:'Novo Lead'});state.leads.push(r);renderApp();return true})}
+async function advance(id){const s=['Novo Lead','Contato realizado','Interesse identificado','Proposta enviada','Negociação','Venda realizada'];const l=state.leads.find(x=>x.id===id),i=s.indexOf(l.stage);if(i<s.length-1){l.stage=s[i+1];await update('leads',id,{stage:l.stage});renderApp()}}
+function products(){return `<div class="top"><div><h1>Produtos</h1><div class="muted">Catálogo</div></div><button class="primary" onclick="newProduct()">+ Produto</button></div><div class="section">${state.products.length?`<table><tr><th>Produto</th><th>Preço</th><th>Custo</th><th>Estoque</th></tr>${state.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${money(p.price)}</td><td>${money(p.cost)}</td><td>${p.stock}</td></tr>`).join('')}</table>`:'<div class="empty">Nenhum produto.</div>'}</div>`}
+function newProduct(){modal('Novo produto',`<label>Nome</label><input class="input" id="name"><label>Preço</label><input class="input" id="price" type="number" step="0.01"><label>Custo</label><input class="input" id="cost" type="number" step="0.01"><label>Estoque</label><input class="input" id="stock" type="number">`,async x=>{const name=x.querySelector('#name').value.trim();if(!name)return false;const r=await insert('products',{name,price:Number(x.querySelector('#price').value)||0,cost:Number(x.querySelector('#cost').value)||0,stock:Number(x.querySelector('#stock').value)||0});state.products.push(r);renderApp();return true})}
+function orders(){return `<div class="top"><div><h1>Pedidos</h1><div class="muted">Histórico de vendas</div></div><button class="primary" onclick="newOrder()">+ Pedido</button></div><div class="section">${state.orders.length?`<table><tr><th>Cliente</th><th>Data</th><th>Total</th><th>Status</th></tr>${state.orders.slice().reverse().map(o=>`<tr><td>${esc(o.customer)}</td><td>${esc(o.date)}</td><td>${money(o.total)}</td><td>${esc(o.status)}</td></tr>`).join('')}</table>`:'<div class="empty">Nenhum pedido.</div>'}</div>`}
+function newOrder(){modal('Novo pedido',`<label>Cliente</label><input class="input" id="customer"><label>Total</label><input class="input" id="total" type="number" step="0.01"><label>Status</label><select class="input" id="status"><option>Novo</option><option>Confirmado</option><option>Entregue</option><option>Concluído</option><option>Cancelado</option></select><label>Data</label><input class="input" id="date" type="date" value="${new Date().toISOString().slice(0,10)}">`,async x=>{const customer=x.querySelector('#customer').value.trim();if(!customer)return false;const r=await insert('orders',{customer,total:Number(x.querySelector('#total').value)||0,status:x.querySelector('#status').value,date:x.querySelector('#date').value});state.orders.push(r);renderApp();return true})}
+function tasks(){return `<div class="top"><div><h1>Tarefas</h1><div class="muted">Follow-ups</div></div><button class="primary" onclick="newTask()">+ Tarefa</button></div><div class="section">${state.tasks.map(t=>`<div class="lead"><strong>${esc(t.title)}</strong><span class="muted">${esc(t.date||'Sem data')} · ${esc(t.status)}</span><br><button class="secondary" style="margin-top:7px" onclick="completeTask('${t.id}')">${t.status==='Concluída'?'Concluída':'Concluir'}</button></div>`).join('')||'<div class="empty">Nenhuma tarefa.</div>'}</div>`}
+function newTask(){modal('Nova tarefa',`<label>Título</label><input class="input" id="title"><label>Data</label><input class="input" id="date" type="date">`,async x=>{const title=x.querySelector('#title').value.trim();if(!title)return false;const r=await insert('tasks',{title,date:x.querySelector('#date').value,status:'A fazer'});state.tasks.push(r);renderApp();return true})}
+async function completeTask(id){await update('tasks',id,{status:'Concluída'});const t=state.tasks.find(x=>x.id===id);if(t)t.status='Concluída';renderApp()}
+
+function profile(){
+ const email=state.user.email||'';const created=state.profile?.created_at?new Date(state.profile.created_at).toLocaleDateString('pt-BR'):'-';
+ return `<div class="top"><div><h1>PERFIL</h1><div class="muted">Sua conta do CAFÉ DO PADRIM</div></div></div>
+ <div class="profileHero"><div class="avatar">${initials(email)}</div><div><strong>${esc(email)}</strong><div class="profileEmail">Perfil criado em ${created}</div></div></div>
+ <div class="section"><h2>Conta</h2><p>Este perfil é vinculado ao e-mail <strong>${esc(email)}</strong>.</p>
+ <div class="profileActions"><button class="primary" onclick="changePassword()">Alterar senha</button><button class="secondary" onclick="switchAccount()">Trocar de conta</button><button class="secondary" onclick="logout()">Sair da conta</button></div>
+ </div>
+ <div class="section" style="margin-top:14px"><h2>Trocar de conta</h2><p class="muted">Para entrar com outra pessoa, saia deste perfil e use o e-mail e a senha do outro perfil. Cada conta possui seus próprios clientes, leads, pedidos, produtos e tarefas.</p><button class="primary" onclick="switchAccount()">SAIR E ENTRAR COM OUTRA CONTA</button></div>`;
+}
+async function changePassword(){
+ const p=prompt('Digite a nova senha:');
+ if(!p)return;
+ const p2=prompt('Digite novamente a nova senha:');
+ if(p!==p2)return alert('As senhas não conferem.');
+ const r=await sb.auth.updateUser({password:p});
+ if(r.error)alert(r.error.message);else alert('Senha alterada com sucesso.');
+}
+async function switchAccount(){await logout()}
+
+function renderApp(){
+ if(!state.user)return;
+ if(!document.getElementById('app'))shell();
+ layout();
+ const pages={dashboard,customers,leads,orders,products,tasks,profile};
+ document.getElementById('app').innerHTML=pages[state.page]();
+}
+async function boot(){
+ if(!configured){
+  document.getElementById('root').innerHTML=`<div class="auth"><section class="authcard"><div class="logo">☕</div><h1>CAFÉ DO PADRIM</h1><p class="sub">Configuração do Supabase</p><p class="hint">Abra o <b>index.html</b> e preencha SUPABASE_URL e SUPABASE_ANON_KEY com os dados públicos do seu projeto Supabase. Depois execute <b>supabase_schema.sql</b> no SQL Editor.</p></section></div>`;
+  return;
+ }
+ const r=await sb.auth.getSession();
+ if(r.data.session)await start(r.data.session.user);else authScreen('login');
+ sb.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){state.user=null;state.profile=null;authScreen('login')}})
+}
+boot();
+</script>
+</body>
+</html>
